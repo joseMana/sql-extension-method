@@ -103,6 +103,56 @@ public static class ListExtensions
 
         return result;
     }
+
+    public static List<EmployeeDepartment> InnerJoin(this List<EmployeeRecord> employees, List<DepartmentRecord> departments, Func<EmployeeRecord, DepartmentRecord, bool> condition)
+    {
+        var result = new List<EmployeeDepartment>();
+
+        foreach (var employee in employees)
+        {
+            foreach (var department in departments)
+            {
+                if (condition(employee, department))
+                {
+                    result.Add(new EmployeeDepartment
+                    {
+                        EmployeeName = employee.Name,
+                        Position = employee.Position,
+                        Salary = employee.Salary,
+                        DepartmentId = employee.DepartmentId,
+                        DepartmentName = department.DepartmentName
+                    });
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static List<EmployeeDepartment> InnerJoin(this List<DepartmentRecord> departments, List<EmployeeRecord> employees, Func<DepartmentRecord, EmployeeRecord, bool> condition)
+    {
+        var result = new List<EmployeeDepartment>();
+
+        foreach (var department in departments)
+        {
+            foreach (var employee in employees)
+            {
+                if (condition(department, employee))
+                {
+                    result.Add(new EmployeeDepartment
+                    {
+                        EmployeeName = employee.Name,
+                        Position = employee.Position,
+                        Salary = employee.Salary,
+                        DepartmentId = employee.DepartmentId,
+                        DepartmentName = department.DepartmentName
+                    });
+                }
+            }
+        }
+
+        return result;
+    }
 }
 
 public class Program
@@ -131,7 +181,7 @@ public class Program
         //    Console.WriteLine($"{item.EmployeeName} - {item.Position} - {item.Salary} - {item.DepartmentName}");
         //}
 
-        var joinedList = departments.LeftJoin(employees, (e, d) => e.DepartmentId == d.DepartmentId);
+        var joinedList = departments.InnerJoin(employees, (e, d) => e.DepartmentId == d.DepartmentId);
         foreach (var item in joinedList)
         {
             Console.WriteLine($"{item.EmployeeName} - {item.Position} - {item.Salary} - {item.DepartmentName}");
